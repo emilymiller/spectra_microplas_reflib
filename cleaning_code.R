@@ -4,7 +4,18 @@ setwd("C:/Users/emily/Documents/MBARI/spectra")
 reflib214<-read.csv("./S&N Labs results/MBA Raman Project Shipment #2/MBA Reference Library (White Box)/PLAS 214 532 nm.csv",
                     skip=1)
 head(reflib214)
-plot(reflib214$INT~reflib214$Raman.Shift...cm.1)                  
+plot(reflib214$INT~reflib214$Raman.Shift...cm.1)   
+
+themeo <-theme_classic()+
+  theme(strip.background = element_blank(),
+        axis.line = element_blank(),
+        axis.text.x = element_text(margin = margin( 0.2, unit = "cm")),
+        axis.text.y = element_text(margin = margin(c(1, 0.2), unit = "cm")),
+        axis.ticks.length=unit(-0.1, "cm"),
+        panel.border = element_rect(colour = "black", fill=NA, size=.5),
+        legend.title=element_blank(),
+        strip.text=element_text(hjust=0) )
+
 ggplot(reflib214)+
   geom_line(aes(x=Raman.Shift...cm.1,y=INT))+
   xlab("Raman Shift / cm-1")+
@@ -13,6 +24,7 @@ ggplot(reflib214)+
 
 library(tidyverse)
 library(stringr)
+library(ggplot2)
 
 list_of_files <- list.files(path = "./S&N Labs results/MBA Raman Project Shipment #2/MBA Reference Library (White Box)",
                             recursive = TRUE,
@@ -42,10 +54,43 @@ ggplot(df, aes(x=raman_shift, y=INT,
   ylab("Intensity")+
   themeo + theme(text=element_text(size=10))
 
+### split into two pages for size
+
+#install.packages("ggforce")
+library(ggforce)
+
+# Pagination: page 1
+df$wave_number<-as.factor(df$wave_number)
+ggplot(df, aes(x=raman_shift, y=INT,
+               color=wave_number)) + 
+  geom_line()+ facet_wrap_paginate(sample_id~wave_number,scales="free",
+                                   ncol = 4, nrow = 4,
+                                   page = 1)+
+  xlab("Raman Shift / cm-1")+
+  ylab("Intensity")+
+  themeo + theme(text=element_text(size=10))
+
+
 #* start by doing separate paneled plot for 532 and 780
 #(so that the axes are dif)
 
+#dev.off()
+
+ggplot(df, aes(x=raman_shift, y=INT,
+               color=wave_number)) + 
+  geom_line()+ facet_wrap(.~sample_id,scales="free")+
+  xlab("Raman Shift / cm-1")+
+  ylab("Intensity")+
+  themeo + theme(text=element_text(size=10))
+
+
+
 #* then do same for the sediment data
+
+
+
+
+
 
 #* go through tyler's code
 
