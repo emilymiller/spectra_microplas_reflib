@@ -151,10 +151,9 @@ micropart<-df
 
 
 
-#* go through tyler's code
+#* go through tyler's script #2
 
-# add a source column and material column or merge with database
-
+# add a source column and material column by merging with database
 
 #* how to combine the two wave numbers per sample
 
