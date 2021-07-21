@@ -169,6 +169,18 @@ micropart$sample_id <- paste("mp", micropart$sample_id, sep="")
 #* go through tyler's script #2
 
 # add a source column and material column by merging with database
+reflib_meta<-read.csv("polymer_specimen_library_for_spectroscopy.csv")
+micropart_part_meta<-read.csv("sediment_microplastic_particles.csv")
+micropart_samp_meta<-read.csv("sediment_sample_metadata.csv")
+
+head(reflib_meta)
+names(reflib_meta)
+reflib_meta<-reflib_meta[,1:22]
+
+colnames(reflib_meta)[3]<-"sample_id"
+reflib_source<-merge(x = reflib, y = reflib_meta, by = "sample_id", all.x = TRUE)
+head(reflib_source)
+sum(is.na(reflib_source$INT))
 
 #* how to combine the two wave numbers per sample
 
