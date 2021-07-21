@@ -148,8 +148,23 @@ micropart<-df
 #dev.off()
 
 
+######################################
 
+# formatting dataframes reflib and micropart
 
+library(stringr)
+reflib$sample_id<-str_replace_all(reflib$sample_id, fixed(" "), "")
+head(reflib)
+unique(micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-4","050-4",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-1","050-1",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="-10","050-10",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-2","050-2",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-3","050-3",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-5","050-5",micropart$sample_id)
+micropart$sample_id<-ifelse(micropart$sample_id=="0-9","050-9",micropart$sample_id)
+
+micropart$sample_id <- paste("mp", micropart$sample_id, sep="")
 
 #* go through tyler's script #2
 
