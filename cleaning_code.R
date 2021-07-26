@@ -16,6 +16,8 @@ themeo <-theme_classic()+
         legend.title=element_blank(),
         strip.text=element_text(hjust=0) )
 
+library(ggplot2)
+
 ggplot(reflib214)+
   geom_line(aes(x=Raman.Shift...cm.1,y=INT))+
   xlab("Raman Shift / cm-1")+
@@ -24,7 +26,7 @@ ggplot(reflib214)+
 
 library(tidyverse)
 library(stringr)
-library(ggplot2)
+
 
 list_of_files <- list.files(path = "./S&N Labs results/MBA Raman Project Shipment #2/MBA Reference Library (White Box)",
                             recursive = TRUE,
@@ -166,8 +168,6 @@ micropart$sample_id<-ifelse(micropart$sample_id=="0-9","050-9",micropart$sample_
 
 micropart$sample_id <- paste("mp", micropart$sample_id, sep="")
 
-#* go through tyler's script #2
-
 # add a source column and material column by merging with database
 reflib_meta<-read.csv("polymer_specimen_library_for_spectroscopy.csv")
 micropart_part_meta<-read.csv("sediment_microplastic_particles.csv")
@@ -181,8 +181,119 @@ colnames(reflib_meta)[3]<-"sample_id"
 reflib_source<-merge(x = reflib, y = reflib_meta, by = "sample_id", all.x = TRUE)
 head(reflib_source)
 sum(is.na(reflib_source$INT))
+rm(reflib_meta)
+rm(reflib)
+rm(reflib214)
+
+# add metadata to particles dataframe
+head(micropart)
+unique(micropart$sample_id)
+class(micropart$sample_id)
+head(micropart_part_meta)
+
+# pull out the slide50 particles and remove from 
+# metadata to add back in later
+unique(micropart_part_meta$circled_slide_no)
+air_blank = subset(micropart_part_meta, circled_slide_no == "50-1"|
+                   circled_slide_no == "50-2"|
+                     circled_slide_no == "50-3"|
+                     circled_slide_no == "50-4"|
+                     circled_slide_no == "50-5"|
+                     circled_slide_no == "50-6"|
+                     circled_slide_no == "50-7"|
+                     circled_slide_no == "50-8"|
+                     circled_slide_no == "50-9"|
+                     circled_slide_no == "50-10")
+
+head(air_blank)
+
+micropart_part_meta2 = subset(micropart_part_meta, circled_slide_no != "50-1"&
+                     circled_slide_no != "50-2"&
+                     circled_slide_no != "50-3"&
+                     circled_slide_no != "50-4"&
+                     circled_slide_no != "50-5"&
+                     circled_slide_no != "50-6"&
+                     circled_slide_no != "50-7"&
+                     circled_slide_no != "50-8"&
+                     circled_slide_no != "50-9"&
+                     circled_slide_no != "50-10")
+# 
+head(micropart_part_meta2)
+
+micropart_part_meta2$sample_id2<- 
+  formatC(micropart_part_meta2$circled_slide_no, width = 3, 
+        format = "d", flag = "0")
+colnames(micropart_part_meta2)[2]<-"slide_id"
+colnames(micropart_part_meta2)[15]<-"sample_id"
+micropart_part_meta2$sample_id <- paste("mp", micropart_part_meta2$sample_id, sep="")
+head(micropart_part_meta2)
+
+# merge in particle metadata
+head(air_blank)
+colnames(air_blank)[2]<-"slide_id"
+air_blank$sample_id <- paste("mp0", air_blank$circled_slide_no, sep="")
+
+# bring air blanks back in to main file
+micropart_part_meta3<-rbind(micropart_part_meta2,air_blank)
+head(micropart_part_meta3)
+rm(micropart_part_meta)
+rm(micropart_part_meta2)
+rm(air_blank)
+
+# merge micropart_particles with micropart_sample_metadata, keeping
+# all particle rows and dropping sample data that didn't produce any particles
+names(micropart_part_meta3)
+head(micropart_part_meta3)
+unique(micropart_part_meta3$slide_id)
+names(micropart_samp_meta)
+unique(micropart_samp_meta$label_supernatant_filter)
+# in micropart_samp_meta$label_supernatant_filter, drop last three 
+# characters if they are "_sn" 
+micropart_samp_meta$label_supernatant_filter <- 
+  as.character(micropart_samp_meta$label_supernatant_filter)
+head(micropart_samp_meta)
+library(stringr)
+micropart_samp_meta <- micropart_samp_meta %>%
+  mutate_at("label_supernatant_filter", str_replace, "_sn", "")
+unique(micropart_samp_meta$label_supernatant_filter)
+micropart_samp_meta$slide_id<-micropart_samp_meta$label_supernatant_filter
+unique(micropart_samp_meta$slide_id)
+
+unique(micropart_part_meta3$slide_id)
+
+micropart_part_meta3 <- micropart_part_meta3 %>%
+  mutate_at("slide_id", str_replace, "_sn", "")
+micropart_part_meta3 <- micropart_part_meta3 %>%
+  mutate_at("slide_id", str_replace, "_ws", "")
+unique(micropart_part_meta3$slide_id)
+
+micropart_allmeta<- merge(x = micropart_part_meta3, y = micropart_samp_meta,
+                         by="slide_id",all.x=T)
+sort(unique(micropart_allmeta$sample_id.x))
+sort(unique(micropart_allmeta$sample_id.y))
+micropart_allmeta$sample_id<-micropart_allmeta$sample_id.x
+
+micropart_source<-merge(x = micropart, y = micropart_allmeta, by = "sample_id", all.x = TRUE)
+head(micropart_source)
+sum(is.na(micropart_source$INT))
+unique(micropart_source$sample_id) # 48 out of 59
+unique(micropart_source$site)
+
+rm(micropart_allmeta)
+rm(micropart_part_meta3)
+rm(micropart_samp_meta)
+rm(micropart)
+rm(df)
+head(micropart_source$sample_id)
+##########################################
+
+unique(micropart_source$site) # site location
+particles_meta <- micropart_source[!duplicated(micropart_source$sample_id), ]
+
+# use micropart_source and reflib_source to match in next script
 
 #* how to combine the two wave numbers per sample
 # or just choose the 780 if both present
+# rescale 780 and 532 to be same scale
 
 # pearson's distance
