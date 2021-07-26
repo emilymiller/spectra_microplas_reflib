@@ -183,5 +183,6 @@ head(reflib_source)
 sum(is.na(reflib_source$INT))
 
 #* how to combine the two wave numbers per sample
+# or just choose the 780 if both present
 
 # pearson's distance
