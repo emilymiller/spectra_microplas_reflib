@@ -36,6 +36,7 @@ list_of_files <- list.files(path = "./S&N Labs results/MBA Raman Project Shipmen
 df<-list_of_files %>% set_names() %>%
   map_df(read_csv,skip=1,.id="file_name")
 df<-as.data.frame(df)
+head(df)
 df$wave_number1 = str_sub(df$file_name,-10)
 df$wave_number <- str_sub(df$wave_number1,1,3)
 df$wave_number1 <- NULL
@@ -48,6 +49,49 @@ head(df)
 df$raman_shift<-df[,1]
 
 dev.off()
+
+############################################################################
+# now incorporate shipment one data
+############################################################################
+
+
+list_of_files <- list.files(path = "./S&N Labs results/24364 Raw Spectra and CSV Files",
+                            recursive = TRUE,
+                            pattern = "\\.csv$",
+                            full.names = TRUE)
+
+df2<-list_of_files %>% set_names() %>%
+  map_df(read_csv,skip=1,.id="file_name")
+
+df2<-as.data.frame(df2)
+head(df2)
+names(df2)
+unique(df2$ArbY)
+df2$ArbY<-NULL
+
+df2$wave_number <- 532
+df2$sample_id1 <- str_sub(df2$file_name,-19)
+df2$sample_id <-str_sub(df2$sample_id1,1,9)
+df2$file_name <-NULL
+df2$sample_id1<-NULL
+head(df2)
+df2$sample_id<-gsub(" ","",as.character(df2$sample_id))
+head(df2)
+
+df2$raman_shift<-df2[,1]
+df2$`Raman Shift / cm-1`<-NULL
+head(df2)
+dev.off()
+
+############################################################################
+# combine reflib batches
+
+head(df)
+df$`Raman Shift / cm-1`<-NULL
+head(df2)
+df3<-rbind(df,df2)
+
+############################################################################
 
 # single page of all plots by sample (both wave numbers
 # for a given sample are on one plot)
