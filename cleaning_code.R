@@ -75,7 +75,7 @@ df2$sample_id <-str_sub(df2$sample_id1,1,9)
 df2$file_name <-NULL
 df2$sample_id1<-NULL
 head(df2)
-df2$sample_id<-gsub(" ","",as.character(df2$sample_id))
+#df2$sample_id<-gsub(" ","",as.character(df2$sample_id))
 head(df2)
 
 df2$raman_shift<-df2[,1]
@@ -95,12 +95,16 @@ df3<-rbind(df,df2)
 
 # single page of all plots by sample (both wave numbers
 # for a given sample are on one plot)
-ggplot(df, aes(x=raman_shift, y=INT,
+ggplot(df3, aes(x=raman_shift, y=INT,
                color=wave_number)) + 
   geom_line()+ facet_wrap(.~sample_id,scales="free")+
   xlab("Raman Shift / cm-1")+
   ylab("Intensity")+
-  themeo + theme(text=element_text(size=10))
+  themeo + theme(text=element_text(size=6))
+
+# reorder by name
+
+# separate those with fluorecense
 
 ### Split into multiple pages for size and separated
 ### samples that were run at both wave numbers (532 & 780nm) 
