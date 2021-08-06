@@ -102,6 +102,8 @@ ggplot(df3, aes(x=raman_shift, y=INT,
   ylab("Intensity")+
   themeo + theme(text=element_text(size=6))
 
+write.csv(df3,file="reflib_combined_df.csv")
+
 # reorder by name
 
 # separate those with fluorecense
@@ -114,18 +116,19 @@ ggplot(df3, aes(x=raman_shift, y=INT,
 library(ggforce)
 
 # Pagination: page 1 example
-df$wave_number<-as.factor(df$wave_number)
-ggplot(df, aes(x=raman_shift, y=INT,
+df3$wave_number<-as.factor(df3$wave_number)
+ggplot(df3, aes(x=raman_shift, y=INT,
                color=wave_number)) + 
   geom_line()+ facet_wrap_paginate(sample_id~wave_number,scales="free",
                                    ncol = 4, nrow = 4,
-                                   page = 3)+
+                                   page = 5)+
   xlab("Raman Shift / cm-1")+
   ylab("Intensity")+
   themeo + theme(text=element_text(size=10))
 
-reflib<-df
-#dev.off()
+reflib<-df3 # has both batches
+
+dev.off()
 
 
 ##########################################
@@ -161,6 +164,7 @@ df$file_name <-NULL
 head(df)
 
 df$raman_shift<-df[,1]
+df$`Raman Shift / cm-1`<-NULL
 
 dev.off()
 
@@ -188,7 +192,7 @@ ggplot(df, aes(x=raman_shift, y=INT,
                color=wave_number)) + 
   geom_line()+ facet_wrap_paginate(sample_id~wave_number,scales="free",
                                    ncol = 4, nrow = 4,
-                                   page = 4)+
+                                   page = 1)+
   xlab("Raman Shift / cm-1")+
   ylab("Intensity")+
   themeo + theme(text=element_text(size=10))
@@ -338,7 +342,10 @@ head(micropart_source$sample_id)
 unique(micropart_source$site) # site location
 particles_meta <- micropart_source[!duplicated(micropart_source$sample_id), ]
 
-# use micropart_source and reflib_source to match in next script
+# use micropart_source and reflib_source to match in 
+# next script
+write.csv(micropart_source,file="micropart_source.csv")
+write.csv(reflib_source,file="reflib_source.csv")
 
 #* how to combine the two wave numbers per sample
 # or just choose the 780 if both present
