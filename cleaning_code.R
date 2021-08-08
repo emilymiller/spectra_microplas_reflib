@@ -206,10 +206,12 @@ micropart<-df
 
 # formatting dataframes reflib and micropart
 
+
 library(stringr)
 reflib$sample_id<-str_replace_all(reflib$sample_id, fixed(" "), "")
 head(reflib)
 unique(micropart$sample_id)
+
 micropart$sample_id<-ifelse(micropart$sample_id=="0-4","050-4",micropart$sample_id)
 micropart$sample_id<-ifelse(micropart$sample_id=="0-1","050-1",micropart$sample_id)
 micropart$sample_id<-ifelse(micropart$sample_id=="-10","050-10",micropart$sample_id)
@@ -345,7 +347,8 @@ particles_meta <- micropart_source[!duplicated(micropart_source$sample_id), ]
 # use micropart_source and reflib_source to match in 
 # next script
 write.csv(micropart_source,file="micropart_source.csv")
-write.csv(reflib_source,file="reflib_source.csv")
+write.csv(reflib_source,file="reflib_source.csv") # -> go to reflib_fig1.R 
+
 
 #* how to combine the two wave numbers per sample
 # or just choose the 780 if both present
