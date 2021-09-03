@@ -1,11 +1,12 @@
 # read in CSVs
 getwd()
-setwd("C:/Users/emily/Documents/MBARI/spectra")
+setwd("C:/Users/emily/Documents/MBARI/microplastics/spectra_microplas_reflib")
 reflib214<-read.csv("./S&N Labs results/MBA Raman Project Shipment #2/MBA Reference Library (White Box)/PLAS 214 532 nm.csv",
                     skip=1)
 head(reflib214)
 plot(reflib214$INT~reflib214$Raman.Shift...cm.1)   
 
+library(ggplot2)
 themeo <-theme_classic()+
   theme(strip.background = element_blank(),
         axis.line = element_blank(),
@@ -16,7 +17,6 @@ themeo <-theme_classic()+
         legend.title=element_blank(),
         strip.text=element_text(hjust=0) )
 
-library(ggplot2)
 
 ggplot(reflib214)+
   geom_line(aes(x=Raman.Shift...cm.1,y=INT))+
