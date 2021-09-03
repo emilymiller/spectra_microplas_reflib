@@ -138,8 +138,7 @@ dev.off()
 ##########################################
 
 
-
-setwd("C:/Users/emily/Documents/MBARI/spectra")
+##########################################
 
 list_of_files <- list.files(path = "./S&N Labs results/MBA Raman Project Shipment #2/MBA Microparticles (Red Box)",
                             recursive = TRUE,
@@ -177,7 +176,7 @@ ggplot(df, aes(x=raman_shift, y=INT,
   ylab("Intensity")+
   themeo + theme(text=element_text(size=6))
 
-# needs redo for sample ids with duplicate numbers (# 050)
+# needs redone for sample ids with duplicate numbers (# 050)
 
 ### Split into multiple pages for size and separated
 ### samples that were run at both wave numbers (532 & 780nm) 
@@ -206,7 +205,7 @@ micropart<-df
 
 # formatting dataframes reflib and micropart
 
-
+micropart<-df
 library(stringr)
 reflib$sample_id<-str_replace_all(reflib$sample_id, fixed(" "), "")
 head(reflib)
@@ -221,6 +220,47 @@ micropart$sample_id<-ifelse(micropart$sample_id=="0-5","050-5",micropart$sample_
 micropart$sample_id<-ifelse(micropart$sample_id=="0-9","050-9",micropart$sample_id)
 
 micropart$sample_id <- paste("mp", micropart$sample_id, sep="")
+
+
+# # #
+df<-micropart
+
+# single page of all plots by sample (both wave numbers
+# for a given sample are on one plot)
+ggplot(df, aes(x=raman_shift, y=INT,
+               color=wave_number)) + 
+  geom_line()+ facet_wrap(.~sample_id,scales="free")+
+  xlab("Raman Shift / cm-1")+
+  ylab("Intensity")+
+  themeo + theme(text=element_text(size=6))
+
+# redone for sample ids with duplicate numbers (# 050)
+
+### Split into multiple pages for size and separated
+### samples that were run at both wave numbers (532 & 780nm) 
+### into two plots. Axes are different.
+
+#install.packages("ggforce")
+library(ggforce)
+
+# Pagination: page 1 example
+df$wave_number<-as.factor(df$wave_number)
+ggplot(df, aes(x=raman_shift, y=INT,
+               color=wave_number)) + 
+  geom_line()+ facet_wrap_paginate(sample_id~wave_number,scales="free",
+                                   ncol = 4, nrow = 4,
+                                   page = 1)+
+  xlab("Raman Shift / cm-1")+
+  ylab("Intensity")+
+  themeo + theme(text=element_text(size=10))
+
+
+
+
+# # # 
+
+
+
 
 # add a source column and material column by merging with database
 reflib_meta<-read.csv("polymer_specimen_library_for_spectroscopy.csv")
