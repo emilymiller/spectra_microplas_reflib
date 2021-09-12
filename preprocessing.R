@@ -33,7 +33,7 @@
 # of the spectra assignments. 
 # Calculate the most closely correlated plastic to the unlabeled specimen.
 
-setwd("C:\\Users\\emily\\Documents\\MBARI\\spectra")
+setwd("C:/Users/emily/Documents/MBARI/microplastics/spectra_microplas_reflib")
 getwd()
 
 # Load libraries 
@@ -67,12 +67,12 @@ reflib_categories<-read.csv("reflib_categories.csv")
 names(reflib_categories)
 reflib_categories$X.1<-NULL
 colnames(reflib_categories)[1]<- "ID"
-colnames(reflib_categories)[26]<- "SAMPLE"
+colnames(reflib_categories)[25]<- "SAMPLE" # 26
 colnames(reflib_categories)[2]<- "INTENSITY"
 colnames(reflib_categories)[4]<- "WAVE"
-colnames(reflib_categories)[27]<- "SOURCE"
+colnames(reflib_categories)[26]<- "SOURCE" #27
 reflib_categories$PARTICLE <- reflib_categories$ID
-
+head(reflib_categories)
 ##########################################################
 #
 # if both 785 and 532 runs present, go with 785
