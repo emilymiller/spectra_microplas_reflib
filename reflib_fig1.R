@@ -244,7 +244,18 @@ ggplot(category_counts)+#,
 # THAT INCLUDE UNKNOWN LABELS
 # - first assign knowns like strawberry container (polypropelene)
 # - then group others as unknown
+# - then color code for polymer categories that are both
+# - weathered and pristine
 #
+# create column that is a combo of polymer-category
+# then pull unique
+# then maybe just hand color in illustrator
+# 
+category_counts$polymer_category <- paste(category_counts$gen_poly,
+                                          category_counts$category,
+                                          sep="-")
+head(category_counts)
+sort(unique(category_counts$polymer_category))
 ###################################################################
 head(reflib_source)
 names(reflib_source)
