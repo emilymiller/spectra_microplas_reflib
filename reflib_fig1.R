@@ -1,14 +1,17 @@
 # Reference library Figure 1 (infographic)
 
-setwd("C:/Users/emily/Documents/MBARI/spectra")
 
-#reflib_comb<-read.csv("reflib_combined_df.csv",stringsAsFactors = FALSE)
-#head(reflib_comb)
-#head(reflib_source)
-#reflib_comb$X<-NULL
+getwd()
+setwd("C:/Users/emily/Documents/MBARI/microplastics/spectra_microplas_reflib")
+#setwd("C:/Users/emily/Documents/MBARI/spectra")
+
+#read.csv(micropart_source,file="micropart_source.csv")
+# reflib_source.csv is file from cleaning_code.R 
 
 # use reflib source
 reflib_source<-read.csv("reflib_source.csv")
+reflib_source$X.1<-NULL
+reflib_source$X <-NULL
 reflib_comb<-reflib_source
 # Donut plot
 
@@ -89,8 +92,48 @@ ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
   theme_void() +
   theme(legend.position = "none")
 
+#####################################################
+#
+# break out weathered plastics
+#
+#####################################################
 
+head(category_counts)
+unique(category_counts$category)
+weathered<-category_counts[category_counts$category==
+                "wild_plastic",]
+head(weathered)
+# plot counts of parent_grp
 
+ggplot(weathered,aes(x=parent_grp))+
+  geom_bar(stat="count")+
+  themeo
+
+#######################################################
+#
+# animal species silhouettes
+# 
+#######################################################
+#
+unique(category_counts$source)
+
+# pacific purple sea urchin
+# squid beaks
+# chinook salmon
+# green mussel
+# squid bell
+# tiger shrimp carapace
+# laysan albatros
+# sea otter
+# rhino auklet
+# macrocystis
+# dungeness crab
+# zostera eelgrass
+# surf clam
+# charcoal
+# olive ridley sea turtle
+
+# use phylopic downloads
 
 ########################################################
 #
@@ -167,25 +210,42 @@ category_counts$gen_poly<-ifelse(category_counts$gen_poly==
 
 # Make the plot
 
-# color scheme
+# rainbow color scheme
 library(RColorBrewer)
 colourCount = length(unique(category_counts$gen_poly))
 getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
 
+# polymer category color scheme
+#unique(category_counts$category)
+
+
+
 # plot
 
+category_counts$category<-as.factor(category_counts$category)
 ggplot(category_counts)+#,
   #   aes(y=reorder(gen_poly,gen_poly,
   #                 function(y)+length(y))))+
   geom_bar(aes(y=reorder(gen_poly,gen_poly,
-                         function(y)+length(y))),
-           width=0.5,fill=getPalette(colourCount))+
+                        function(y)+length(y))),
+           width=0.5, fill=getPalette(colourCount))+
+           #width=0.5,fill=getPalette(3))+
   scale_fill_brewer(palette="Spectral")+
   xlab("no. specimens represented")+
   ylab("polymer")+
   themeo+theme(axis.ticks.length = unit(0,"cm"),
                text=element_text(size=8))
 
+################################################################
+#
+#  COME BACK TO THE ABOVE
+#
+#  NOW INCLUDES THE AGRICULTURAL AND BEACHCAST PLASTICS
+# THAT INCLUDE UNKNOWN LABELS
+# - first assign knowns like strawberry container (polypropelene)
+# - then group others as unknown
+#
+###################################################################
 head(reflib_source)
 names(reflib_source)
 names(category_counts)
@@ -248,6 +308,36 @@ reflib_categories$wave_number<-ifelse(reflib_categories$wave_number==
 
 head(reflib_categories)
 write.csv(reflib_categories,file="reflib_categories.csv")
+
+#######################################################
+
+# redo plot with colors coded to biological and
+# anthropogenic categories
+
+#######################################################
+
+head(category_counts)
+str(category_counts)
+# color scheme
+library(RColorBrewer)
+colourCount = length(unique(category_counts$gen_poly))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+
+# plot
+
+ggplot(category_counts)+#,
+  #   aes(y=reorder(gen_poly,gen_poly,
+  #                 function(y)+length(y))))+
+  geom_bar(aes(y=reorder(gen_poly,gen_poly,
+                         function(y)+length(y))),
+           width=0.5,fill=getPalette(colourCount))+
+  scale_fill_brewer(palette="Spectral")+
+  xlab("no. specimens represented")+
+  ylab("polymer")+
+  themeo+theme(axis.ticks.length = unit(0,"cm"),
+               text=element_text(size=8))
+
+
 #######################################################
 #
 #
