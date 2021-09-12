@@ -83,13 +83,45 @@ df2$`Raman Shift / cm-1`<-NULL
 head(df2)
 dev.off()
 
+
+###########################################################################
+#
+# add in the weathered plastics (shipment #5)
+#
+###########################################################################
+
+
+list_of_files <- list.files(path = "./S&N Labs results/S&N Labs JN 25305 (Shipment #5)",
+                            recursive = TRUE,
+                            pattern = "\\.csv$",
+                            full.names = TRUE)
+
+df5<-list_of_files %>% set_names() %>%
+  map_df(read_csv,skip=1,.id="file_name")
+df5<-as.data.frame(df5)
+head(df5)
+df5$wave_number1 = str_sub(df5$file_name,-12)
+df5$wave_number <- str_sub(df5$wave_number1,1,3)
+df5$wave_number1 <- NULL
+df5$sample_id1 <- str_sub(df5$file_name,-21)
+df5$sample_id <-str_sub(df5$sample_id1,1,8)
+df5$file_name <-NULL
+df5$sample_id1<-NULL
+head(df5)
+
+df5$raman_shift<-df5[,1]
+
+
+#
 ############################################################################
 # combine reflib batches
 
 head(df)
 df$`Raman Shift / cm-1`<-NULL
 head(df2)
-df3<-rbind(df,df2)
+head(df5)
+df5$`Raman Shift / cm-1`<-NULL
+df3<-rbind(df,df2,df5)
 
 ############################################################################
 
@@ -126,7 +158,7 @@ ggplot(df3, aes(x=raman_shift, y=INT,
   ylab("Intensity")+
   themeo + theme(text=element_text(size=10))
 
-reflib<-df3 # has both batches
+reflib<-df3 # has all three batches
 
 dev.off()
 
