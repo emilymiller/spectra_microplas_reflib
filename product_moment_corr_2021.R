@@ -16,6 +16,15 @@ base_df$poly_lab<-factor(base_df$poly_lab)
 #cast
 test_cast <- spread(data = base_df, key = WAVE, value = INTENSITY)
 str(test_cast)
+head(test_cast)
+
+###################################################
+#
+write.csv(test_cast,file="test_cast.csv")
+# use in cart.R
+#
+###################################################
+
 
 gc()
 
