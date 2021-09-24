@@ -21,7 +21,7 @@ head(test_cast)
 ###################################################
 #
 write.csv(test_cast,file="test_cast.csv")
-# use in cart.R
+# use in cart.R or maybe not
 #
 ###################################################
 
@@ -114,7 +114,7 @@ lab_df2<-lab_df
 
 colnames(lab_df2)<-c(test_castRMSE$ID, "ID")
 colnames(lab_df2) <- c(as.character(test_castRMSE$ID), 'ID')
-head(lab_df2)
+head(lab_df2) # pearson similarity matrix
 
 #################################################
 #
@@ -149,7 +149,7 @@ plot(five_nj, "unrooted")
 ?nj()
 
 #Plot rooted NJ tree
-plot.phylo(five_nj,font=1,adj=0.1)
+plot.phylo(five_nj,font=1,adj=0.2)
 
 
 
