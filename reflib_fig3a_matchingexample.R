@@ -1,5 +1,7 @@
-# reflib figure 3
+# reflib figure 3 
 # part a
+# then became figure 4
+
 # spectra matching
 
 
@@ -17,6 +19,7 @@
 base_df<-read.csv("reflib_rescaled.csv") # from end of preprocessing
 head(base_df)
 
+base_df$X<-NULL
 PP<- base_df[base_df$poly_lab == "PP",]
 unique(base_df$poly_lab)
 straw <- base_df[base_df$poly_lab == "strawberry container",]
@@ -54,12 +57,31 @@ ggplot(PI)+
   facet_wrap(~PARTICLE)+
   themeo
 
-fig2a<- rbind(PP,P,PI)
+FPM<-base_df[base_df$PARTICLE=="PLAS031",]# (fluorocarbon used fishing gear)
+ggplot(FPM)+
+  geom_line(aes(x=WAVE,y=INTENSITY,color=PARTICLE))+
+  themeo
+
+latex<-base_df[base_df$PARTICLE=="PLAS221",]# (latex)
+ggplot(latex)+
+  geom_line(aes(x=WAVE,y=INTENSITY,color=PARTICLE))+
+  themeo
+
+chinookmuscle<-base_df[base_df$PARTICLE=="BIOL015",]# (myofibrillar protein)
+ggplot(chinookmuscle)+
+  geom_line(aes(x=WAVE,y=INTENSITY,color=PARTICLE))+
+  themeo
+
+
+fig2a<- rbind(PP,P,PI,latex,chinookmuscle,FPM)
 
 fig3a<-fig2a[fig2a$PARTICLE=="PLAS241"|
                 fig2a$PARTICLE=="PLAS223"|
               fig2a$PARTICLE=="PLAS206"|
-              fig2a$PARTICLE=="PLAS197",]
+              fig2a$PARTICLE=="PLAS197"|
+             fig2a$PARTICLE=="BIOL015"|
+               fig2a$PARTICLE=="PLAS221"|
+             fig2a$PARTICLE=="PLAS031",]
 ggplot(fig3a)+
   geom_line(aes(x=WAVE,y=INTENSITY,
                 color=PARTICLE))+
