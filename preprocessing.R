@@ -66,6 +66,7 @@ themeo <-theme_classic()+
 reflib_categories<-read.csv("reflib_categories.csv")
 names(reflib_categories)
 reflib_categories$X.1<-NULL
+reflib_categories$X<-NULL
 colnames(reflib_categories)[1]<- "ID"
 colnames(reflib_categories)[25]<- "SAMPLE" # 26
 colnames(reflib_categories)[2]<- "INTENSITY"
@@ -180,7 +181,7 @@ prePro_sh3et <- function(full_set) {
 ##### Preprocess the individual datasets
 reflib_processed <- prePro_sh3et(full_set = reflib)
 head(reflib_processed)
-sum(is.na(reflib_processed$INTENSITY)==T)
+sum(is.na(reflib_processed$INTENSITY)==T)#0
 #7251
 range(reflib_processed$INTENSITY) # 9500.5 to 56119.0
 #reflib_proc_na<-reflib_processed[is.na(reflib_processed$INTENSITY)==T,]
@@ -201,7 +202,7 @@ ggplot(reflib_processed, aes(WAVE,INTENSITY, color = ID)) +
 dev.off()
 head(reflib_processed)
 
-sum(is.na(reflib_processed$INTENSITY)==T)
+sum(is.na(reflib_processed$INTENSITY)==T)#0
 #7752
 
 #### Rolling median spike removal and polynomial baseline flouresence correction
@@ -251,11 +252,11 @@ poly_below_baseline <- function(foundation) {
 base_df <- poly_below_baseline(foundation = reflib_processed)
 str(base_df)
 
-sum(is.na(base_df$INTENSITY)==T) #7242
+sum(is.na(base_df$INTENSITY)==T)#0 #7242
 class(base_df$INTENSITY)
 base_df_no_na<-base_df[is.na(base_df$INTENSITY)==F,]
 sum(is.na(base_df_no_na$INTENSITY)==T)
-range(base_df_no_na$INTENSITY) # -119 to 21894
+range(base_df_no_na$INTENSITY) # -119.3321 21894.1809 # -119 to 21894
 range(reflib$INTENSITY) # 9489 to 59707
 base_df2<-base_df[base_df$INTENSITY>=200 & base_df$INTENSITY <=3500,]
 
@@ -284,9 +285,9 @@ for(y in 1:length(IDs)){
 head(base_df_new)
 
 base_df_new_na <- base_df_new[is.na(base_df_new$INTENSITY==TRUE),]
-#7242
-unique(base_df_new_na$ID) #68
-sum(is.na(base_df_new_na$INTENSITY)==TRUE) # nearly all
+# 0 #7242
+unique(base_df_new_na$ID) #79 #68
+sum(is.na(base_df_new_na$INTENSITY)==TRUE)  # 0 # nearly all
 
 
 
@@ -342,6 +343,6 @@ rm(base_df_new,svn_df,foundation,i,IDs,y,poly_below_baseline)
 
 #hop over to:
 
-# ProductMomemntCorr.R for spectra reference matching
+# product_moment_corr_2021.R # ProductMomemntCorr.R for spectra reference matching
 # with base_df
 write.csv(base_df,file="reflib_rescaled.csv")
