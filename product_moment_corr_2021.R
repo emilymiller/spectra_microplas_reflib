@@ -4,6 +4,7 @@
 library(forcats)
 library(ggridges)
 library(stringr)
+library(tidyverse)
 
 base_df<- read.csv("reflib_rescaled.csv")
 str(base_df)
@@ -12,6 +13,8 @@ str(base_df)
 base_df$ID<-factor(base_df$ID)
 base_df$SAMPLE<-factor(base_df$SAMPLE)
 base_df$poly_lab<-factor(base_df$poly_lab)
+head(base_df)
+base_df$X<-NULL
 
 #cast
 test_cast <- spread(data = base_df, key = WAVE, value = INTENSITY)
@@ -60,20 +63,31 @@ for(d in 1:length(poly)){
 #clean up
 rm(d,i,plas_one,RMSE,unlab_one)
 str(lab_df)
+gc()
 RMSE_poly <- merge(base_df,lab_df, by = "ID")
 
 unique(RMSE_poly$ID) # 79
 unique(base_df$ID) # 79
 unique(lab_df$ID)# 79
 
-
+themeo <-theme_classic()+
+  theme(strip.background = element_blank(),
+        axis.line = element_blank(),
+        axis.text.x = element_text(margin = margin( 0.2, unit = "cm")),
+        axis.text.y = element_text(margin = margin(c(1, 0.2), unit = "cm")),
+        axis.ticks.length=unit(-0.1, "cm"),
+        panel.border = element_rect(colour = "black", fill=NA, size=.5),
+        legend.title=element_blank(),
+        strip.text=element_text(hjust=0) )
 
 library(RColorBrewer)
 n <- 79
 qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
-palette_poly = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+palette_poly = unlist(mapply(brewer.pal, 
+                             qual_col_pals$maxcolors, 
+                             rownames(qual_col_pals)))
 #poly_list <- unique(base_df$ID)#c("PVC","PSA","PS","PP","Poly","PLA","PET","PC","PA","LDPE","HDPE","ABS",'PMMA','POM') # no N
-poly_list <- unique(RMSE_poly$ID)
+poly_list <- unique(RMSE_poly$ID) # 79
 
 # grid of figures
 myplots <- list()  # new empty list
@@ -85,7 +99,7 @@ for (i in 1:length(poly_list))
               geom_line(aes(group = ID), show.legend = F) +
               #scale_color_brewer(palette = "Spectral")+
               annotate("text", x = 950, y = 1.9, label = name, hjust = "left")+
-              scale_color_manual(values = palette_poly) +
+              #scale_color_manual(values = palette_poly) +
               scale_x_continuous(expand = c(0,0)) +
               #geom_hline(yintercept = c(.13,.22,.4)) +
               coord_cartesian(ylim = c(0.13,2)) + # median cutoff established
@@ -96,7 +110,7 @@ for (i in 1:length(poly_list))
     print(i)
     myplots[[i]] <<- p1  # add each plot into plot list
   })
-
+library(gridExtra)
 grid.arrange(grobs = myplots)
 
 
@@ -132,6 +146,190 @@ rowname_df<-lab_df2$ID
 head(lab_df2)
 #five_dist_mat<- as.matrix(lab_df2)
 five_dist_mat<-data.matrix(lab_df2, rownames.force = NA)
+five_dist_mat<- five_dist_mat[,1:79]
+head(five_dist_mat)
+colnames(five_dist_mat)
+row.names(five_dist_mat)<-rowname_df
+head(five_dist_mat) # distance matrix
+
+################################################33
+#five_dist_mat <- 1-five_dist_mat
+five_dist_mat2  <- as.dist(five_dist_mat) # distance matrix
+
+library(stats)
+plot(hclust(as.dist(1-five_dist_mat)))
+?as.dist
+?hclust
+
+# yay works
+
+# now let's remove all the unlabeled 
+# except strawberry and try again
+
+##########################################
+#
+##########################################
+#
+##########################################
+
+
+
+# from preprocessing.R
+
+# addittional useful libraries
+library(forcats)
+library(ggridges)
+library(stringr)
+library(tidyverse)
+
+base_df<- read.csv("reflib_rescaled.csv")
+str(base_df)
+
+#dropping levels
+base_df$ID<-factor(base_df$ID)
+base_df$SAMPLE<-factor(base_df$SAMPLE)
+base_df$poly_lab<-factor(base_df$poly_lab)
+head(base_df)
+base_df$X<-NULL
+
+base_labeled<-base_df[!base_df$PARTICLE=="PLAS244",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS256",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS251",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS240",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS253",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS248",]
+base_labeled<-base_labeled[!base_labeled$PARTICLE=="PLAS252",]
+
+#cast
+test_cast2 <- spread(data = base_labeled, key = WAVE, value = INTENSITY)
+str(test_cast2)
+head(test_cast2)
+
+###################################################
+#
+write.csv(test_cast2,file="test_cast_labeled_but_straw.csv")
+# use in cart.R or maybe not
+#
+###################################################
+
+
+gc()
+
+head(base_labeled)
+poly <- unique(base_labeled$ID)
+head(base_labeled)
+base_labeled$X<-NULL
+
+# make a plastic DF
+test_castRMSE2 <- test_cast2
+rm(test_cast2)
+lab_df_labeled<- matrix(ncol = length(poly), nrow = dim(test_castRMSE2)[1]) %>% 
+  as.data.frame()
+lab_df_labeled$ID <- test_castRMSE2$ID
+
+for(d in 1:length(poly)){
+  
+  plas_one <- subset(test_castRMSE2, ID == poly[d])    # obtain spectra of one plastic
+  plas_one <- plas_one[,6:dim(plas_one)[2]] %>%       # turn it in to a vector
+    as.matrix() %>% as.vector()      # 
+  colnames(lab_df_labeled)[d] <- poly[d]
+  
+  for(i in 1:dim(test_castRMSE2)[1]){
+    
+    unlab_one <- test_castRMSE2[i,6:dim(test_castRMSE2)[2]] %>% # obtain one unlabeled spectra
+      as.matrix() %>% as.vector() 
+    RMSE <- cor(unlab_one,plas_one)                                                              # this is Pearson's R, calling it RMSE for script continuity
+    lab_df_labeled[ i, d ] <- as.numeric(RMSE)    # provide the RMSE val for that spectra for that plastic
+    print(i)
+  }
+}
+
+#clean up
+rm(d,i,plas_one,RMSE,unlab_one)
+str(lab_df_labeled)
+gc()
+RMSE_poly2 <- merge(base_labeled,lab_df_labeled, by = "ID")
+
+unique(RMSE_poly2$ID) # 71
+unique(base_labeled$ID) # 71
+unique(lab_df_labeled$ID)# 71
+
+themeo <-theme_classic()+
+  theme(strip.background = element_blank(),
+        axis.line = element_blank(),
+        axis.text.x = element_text(margin = margin( 0.2, unit = "cm")),
+        axis.text.y = element_text(margin = margin(c(1, 0.2), unit = "cm")),
+        axis.ticks.length=unit(-0.1, "cm"),
+        panel.border = element_rect(colour = "black", fill=NA, size=.5),
+        legend.title=element_blank(),
+        strip.text=element_text(hjust=0) )
+
+library(RColorBrewer)
+n <- 71
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+palette_poly = unlist(mapply(brewer.pal, 
+                             qual_col_pals$maxcolors, 
+                             rownames(qual_col_pals)))
+#poly_list <- unique(base_df$ID)#c("PVC","PSA","PS","PP","Poly","PLA","PET","PC","PA","LDPE","HDPE","ABS",'PMMA','POM') # no N
+poly_list <- unique(RMSE_poly2$ID) # 79
+
+# grid of figures
+myplots <- list()  # new empty list
+for (i in 1:length(poly_list))
+  local({
+    i <- i
+    name <- poly_list[i]
+    p1 <- ggplot(data = RMSE_poly,aes(x = RMSE_poly$WAVE, y = RMSE_poly$INTENSITY + (RMSE_poly[,name]), color = ID))+ # *4 for RMSE
+      geom_line(aes(group = ID), show.legend = F) +
+      #scale_color_brewer(palette = "Spectral")+
+      annotate("text", x = 950, y = 1.9, label = name, hjust = "left")+
+      #scale_color_manual(values = palette_poly) +
+      scale_x_continuous(expand = c(0,0)) +
+      #geom_hline(yintercept = c(.13,.22,.4)) +
+      coord_cartesian(ylim = c(0.13,2)) + # median cutoff established
+      xlab(NULL)+
+      ylab(NULL)+
+      themeo
+    p1
+    print(i)
+    myplots[[i]] <<- p1  # add each plot into plot list
+  })
+library(gridExtra)
+grid.arrange(grobs = myplots)
+
+
+###################################################
+#
+# cladogram
+#
+#####################################################
+
+# lab_df is our matrix of 71 by 71 (72 with id)
+
+# rename all the columns the ids
+class(lab_df_labeled)
+lab_df_labeled2<-lab_df_labeled
+
+colnames(lab_df_labeled2)<-c(test_castRMSE2$ID, "ID")
+colnames(lab_df_labeled2) <- c(as.character(test_castRMSE2$ID), 'ID')
+head(lab_df_labeled2) # pearson similarity matrix
+
+#################################################
+#
+# turn similarity matrix into distance matrix
+#
+###############################################
+
+library(ape)
+library(phangorn)
+
+# Turn into a distnace matrix. 
+# This is 2 steps and requires the as.dist() command
+rowname_df<-lab_df_labeled2$ID
+#lab_df2$ID<-NULL
+head(lab_df_labeled2)
+#five_dist_mat<- as.matrix(lab_df2)
+five_dist_mat<-data.matrix(lab_df_labeled2, rownames.force = NA)
 five_dist_mat<- five_dist_mat[,1:71]
 head(five_dist_mat)
 colnames(five_dist_mat)
@@ -139,8 +337,33 @@ row.names(five_dist_mat)<-rowname_df
 head(five_dist_mat) # distance matrix
 
 ################################################33
-five_dist_mat <- 1-five_dist_mat
-five_dist_mat2  <- as.dist(five_dist_mat)
+#five_dist_mat <- 1-five_dist_mat
+five_dist_mat2  <- as.dist(five_dist_mat) # distance matrix
+
+library(stats)
+plot(hclust(as.dist(1-five_dist_mat)))
+?as.dist
+?hclust
+
+#################################################
+
+
+
+
+
+
+
+
+
+
+
+#################################################
+#
+##################################################
+#
+##############################################
+
+###################################################
 
 #Neighbor-Joining tree with nj()
 five_nj <- ape::nj(five_dist_mat2)
@@ -149,7 +372,7 @@ plot(five_nj, "unrooted")
 ?nj()
 
 #Plot rooted NJ tree
-plot.phylo(five_nj,font=1,adj=0.2)
+plot.phylo(five_nj,font=1,adj=1)
 
 
 
@@ -162,6 +385,7 @@ par(mfrow = c(1,2))
 plot(five_nj)
 my_upgma <- phangorn::upgma(five_dist_mat2)
 plot(my_upgma)
+dev.off()
 plot(fastme.ols(five_dist_mat2))
 
 class(rowname_df)
