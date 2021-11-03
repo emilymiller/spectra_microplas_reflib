@@ -346,8 +346,8 @@ plot(hclust(as.dist(1-five_dist_mat)))
 ?hclust
 
 #################################################
-
-
+write.csv(five_dist_mat,file="five_dist_mat.csv")
+write.csv(lab_df,file="lab_df.csv")
 
 
 
