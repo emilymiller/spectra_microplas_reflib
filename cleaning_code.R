@@ -193,7 +193,7 @@ df$sample_id1<-NULL
 df$file_name <-NULL
 
 head(df)
-
+range(df$INT) # -526 32843 # will need to handle negatives as before
 df$raman_shift<-df[,1]
 df$`Raman Shift / cm-1`<-NULL
 
