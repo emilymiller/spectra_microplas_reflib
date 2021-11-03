@@ -10,7 +10,7 @@
 # First, we read in the raw Wave/Intensity spectra values. These
 # values reflect the observed intensity at varied Raman shift wavenumbers.
 # S&N had to run spectra scans for some specimens at two different wavenumbers 
-# (532 and 780 nm) when the 532 nm did not produce clear spectra.
+# (532 and 785 nm) when the 532 nm did not produce clear spectra.
 
 # Basic protocol:
 # Read in raw spectra from S&N (pristine plastics, wild plastics (fishing gear,
