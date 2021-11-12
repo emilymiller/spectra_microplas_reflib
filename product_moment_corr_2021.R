@@ -10,6 +10,8 @@ base_df<- read.csv("reflib_rescaled.csv")
 str(base_df)
 
 #dropping levels
+# better to as. factor() as.character() because droplevels() can lead
+# to incorrect reassignments
 base_df$ID<-factor(base_df$ID)
 base_df$SAMPLE<-factor(base_df$SAMPLE)
 base_df$poly_lab<-factor(base_df$poly_lab)
