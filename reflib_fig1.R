@@ -1,66 +1,46 @@
-# Reference library Figure 1 (infographic)
-
+#
+#' #' title: Reference library Figure 1 (infographic)
+#' author: Emily Miller
+#' date: 2021
+#' output: plots that are used in Figure 1 of Miller et al.
+#' manuscript.
+#' order: This is the second script used after 
+#' cleaning_code.R gets all spectra in a usable format.
+#' ---
 
 getwd()
 setwd("C:/Users/emily/Documents/MBARI/microplastics/spectra_microplas_reflib")
-#setwd("C:/Users/emily/Documents/MBARI/spectra")
 
-#read.csv(micropart_source,file="micropart_source.csv")
-# reflib_source.csv is file from cleaning_code.R 
+themeo <-theme_classic()+
+  theme(strip.background = element_blank(),
+        axis.line = element_blank(),
+        axis.text.x = element_text(margin = margin( 0.2, unit = "cm")),
+        axis.text.y = element_text(margin = margin(c(1, 0.2), unit = "cm")),
+        axis.ticks.length=unit(-0.1, "cm"),
+        panel.border = element_rect(colour = "black", fill=NA, size=.5),
+        legend.title=element_blank(),
+        strip.text=element_text(hjust=0) )
 
-# use reflib source
 reflib_source<-read.csv("reflib_source.csv")
-reflib_source$X.1<-NULL
-reflib_source$X <-NULL
-reflib_comb<-reflib_source
-# Donut plot
-
-
-library(ggplot2)
-
-# add category column
-# biological polymers, pristine plastic polymers,
-# wild plastic polymers
-
-# make only one row per sample_id
+reflib_comb<-reflib_source # saving for later
 category_counts <- reflib_source[!duplicated(reflib_source$sample_id),]
 unique(category_counts$parent_grp)
 
-# biological then biological
-
-# pristine plastic =
-    # industrial
-    # bioplastic
-    # consumer (+ new in estimated age)
-    # consumer (+ post purchase new in estimated age)
-    # building material 
-    # boating
-    # container (new)
-    # electronics
-    # adhesive
-    # fiber
-    # upholstery
-
-# wild plastic = 
-    # fishery
-    # agricultural
-    # beachcast
-    # consumer (+used)
-    # consumer (+used kids toy)
-    # container (used)
-    # oml
-
 category_counts$category<-ifelse(category_counts$parent_grp=="biological","biological",
-                ifelse(category_counts$parent_grp=="fishery","wild_plastic",
-                ifelse(category_counts$parent_grp=="consumer" & category_counts$estimated_age=="used","wild_plastic",
-                ifelse(category_counts$parent_grp=="consumer" & category_counts$estimated_age=="used kids toys","wild_plastic",
-                ifelse(category_counts$parent_grp=="container" & category_counts$estimated_age=="used","wild_plastic",
-                ifelse(category_counts$parent_grp=="agricultural", "wild_plastic",
-                ifelse(category_counts$parent_grp=="beachcast", "wild_plastic",
-                ifelse(category_counts$parent_grp=="oml", "wild_plastic", "pristine_plastic"))))))))
+                          ifelse(category_counts$parent_grp=="fishery","wild_plastic",
+                          ifelse(category_counts$parent_grp=="consumer" & category_counts$estimated_age=="used","wild_plastic",
+                          ifelse(category_counts$parent_grp=="consumer" & category_counts$estimated_age=="used kids toys","wild_plastic",
+                          ifelse(category_counts$parent_grp=="container" & category_counts$estimated_age=="used","wild_plastic",
+                          ifelse(category_counts$parent_grp=="agricultural", "wild_plastic",
+                          ifelse(category_counts$parent_grp=="beachcast", "wild_plastic",
+                          ifelse(category_counts$parent_grp=="oml", "wild_plastic", "pristine_plastic"))))))))
 
 head(category_counts)
 library(plyr)
+# Donut plot
+
+library(ggplot2)
+
 histo<-as.data.frame(plyr::count(category_counts$category))
 colnames(histo)[1]<-"category"
 colnames(histo)[2]<-"count"
@@ -238,8 +218,6 @@ ggplot(category_counts)+#,
 
 ################################################################
 #
-#  COME BACK TO THE ABOVE
-#
 #  NOW INCLUDES THE AGRICULTURAL AND BEACHCAST PLASTICS
 # THAT INCLUDE UNKNOWN LABELS
 # - first assign knowns like strawberry container (polypropelene)
@@ -249,7 +227,7 @@ ggplot(category_counts)+#,
 #
 # create column that is a combo of polymer-category
 # then pull unique
-# then maybe just hand color in illustrator
+# finalize aesthetics in illustrator
 # 
 category_counts$polymer_category <- paste(category_counts$gen_poly,
                                           category_counts$category,
@@ -291,8 +269,9 @@ rm(category_counts2)
 
 ######################################################
 #
-# correct wave number for Shipment #1 specimens
-# that were only labeled in original pdf S&N sent
+# correcting wave number in Shipment #1 specimens
+# (they were labeled in original pdf S&N sent, not in 
+# data files)
 #
 #####################################################
 
@@ -322,10 +301,8 @@ write.csv(reflib_categories,file="reflib_categories.csv")
 
 #######################################################
 
-# redo plot with colors coded to biological and
-# anthropogenic categories
-
-#######################################################
+# adjusting color scheme and plotting
+# counts of polymers represented in the library
 
 head(category_counts)
 str(category_counts)
@@ -354,6 +331,10 @@ ggplot(category_counts)+#,
 #
 # take reflib_categories and
 # go to preprocessing.R
+#
+# (reflib_categories is also generated using
+# same steps in cleaning_code.R such that cleaning_code.R
+# and reflib_fig1.R run independently)
 #
 #
 ########################################################
