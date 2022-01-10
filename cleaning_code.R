@@ -3,6 +3,10 @@
 #' author: Emily Miller
 #' date: 2021
 #' output: csvs that are ready for preprocessing script
+#' order: This is the first script use to prepare raw
+#' spectra from the lab. This script prepares the data 
+#' for the preprocessing script and for constructing figures
+#' for the Miller et al. manuscript.
 #' ---
 
 
