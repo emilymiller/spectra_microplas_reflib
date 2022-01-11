@@ -1,3 +1,14 @@
+# 
+#' #' title: reflib figure 3
+#' author: Emily Miller
+#' date: Fall 2021
+#  output: Figure 3 panel component for Miller et al. A figure depicting 
+#   the local maxima for each polymer spectra as a way to
+#   visualize the differences in spectral signatures for all the polymer types.
+#   It requires reflib_rescaled.csv obtained in preprocessing.R
+#
+
+
 # reflib fig3b
 #
 # identifying local maxima for each spectra
