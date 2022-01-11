@@ -4,7 +4,7 @@
 #' author: Emily Miller, based on Tyler Gagne's processing
 #' date: Summer 2021
 #' output: csvs to be used in the matching protocol (next script is
-#' product_moment_corr.R)
+#' product_moment_corr_2021.R)
 #' ---
 
 # In this script a number of preprocessing steps are executed
@@ -26,7 +26,7 @@
 # Calculate the product moment correlation (Pearson's R) of the standardized
 # unlabeled specimens relative to all available training plastic. Essentially, 
 # how closely does the unlabeled specimen covary with the known plastic spectra.
-# This last step will be completed in the next script - product_moment_corr.R.
+# This last step will be completed in the next script - product_moment_corr_2021.R.
 # Calculate the most closely correlated plastic to the unlabeled specimen in
 # the next script as well.
 
@@ -347,6 +347,6 @@ rm(base_df_new,svn_df,foundation,i,IDs,y,poly_below_baseline)
 
 #hop over to:
 
-# product_moment_corr.R for spectra reference matching
+# product_moment_corr_2021.R for spectra reference matching
 # with base_df (reflib_rescaled.csv)
 write.csv(base_df,file="reflib_rescaled.csv")
