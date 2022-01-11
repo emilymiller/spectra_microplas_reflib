@@ -3,35 +3,32 @@
 #' #' title: Preprocessing Raman spectra
 #' author: Emily Miller, based on Tyler Gagne's processing
 #' date: Summer 2021
-#' output: github_document
+#' output: csvs to be used in the matching protocol (next script is
+#' product_moment_corr.R)
 #' ---
 
 # In this script a number of preprocessing steps are executed
 # First, we read in the raw Wave/Intensity spectra values. These
 # values reflect the observed intensity at varied Raman shift wavenumbers.
 # S&N had to run spectra scans for some specimens at two different wavenumbers 
-# (532 and 785 nm) when the 532 nm did not produce clear spectra.
+# when the 532 nm did not produce clear spectra, 785 nm was used.
 
 # Basic protocol:
-# Read in raw spectra from S&N (pristine plastics, wild plastics (fishing gear,
-# consumer, beachcast marine, beachcast estuarine, biological).
+# Read in raw spectra from S&N that have been formatted using cleaning_code.R.
+# They include: pristine plastics, wild plastics (fishing gear,
+# consumer, beachcast marine, beachcast estuarine) and biological.
 
 # Run a 15 Wavenumber wide median filter window through the spectra to pull out 
-# noise/cosmic ray as best we can
+# noise/cosmic ray as best.
 # Fit a 7th order polynomial baseline and calculate residuals as mean to remove
-# fluorescence
-# Conduct basic SVN/min-max standardization
+# fluorescence.
+# Conduct basic SVN/min-max standardization and rescale 0-1 for intensity values.
 # Calculate the product moment correlation (Pearson's R) of the standardized
 # unlabeled specimens relative to all available training plastic. Essentially, 
 # how closely does the unlabeled specimen covary with the known plastic spectra.
-# I also explored cosine similarity, dot product similarity, and RMSE, other common
-# Raman 'Hit Quality Index' (HQI) methods.
-# We could include those for comparison, there is some variance between the 
-# assignments.
-# I get the impression they do not excel at peak location matching in the way
-# the Pearson's product moment correlation does, this is based on my own observation
-# of the spectra assignments. 
-# Calculate the most closely correlated plastic to the unlabeled specimen.
+# This last step will be completed in the next script - product_moment_corr.R.
+# Calculate the most closely correlated plastic to the unlabeled specimen in
+# the next script as well.
 
 setwd("C:/Users/emily/Documents/MBARI/microplastics/spectra_microplas_reflib")
 getwd()
@@ -63,6 +60,7 @@ themeo <-theme_classic()+
 # read in CSVs
 # for console compile
 
+# This file (reflib_catebories.csv) was created in cleaning_code.R
 reflib_categories<-read.csv("reflib_categories.csv")
 names(reflib_categories)
 reflib_categories$X.1<-NULL
@@ -76,7 +74,7 @@ reflib_categories$PARTICLE <- reflib_categories$ID
 head(reflib_categories)
 ##########################################################
 #
-# if both 785 and 532 runs present, go with 785
+# if both 785 and 532 runs present, use 785 nm.
 # 
 ##########################################################
 library(dplyr)
@@ -111,14 +109,14 @@ prePro_sh3et <- function(full_set) {
   for( i in 1:length(fact_vars)){                         
     full_set[,fact_vars[i]] <- as.factor(full_set[,fact_vars[i]])}
   
-  min_spec <- 200 #min(full_set$WAVE)                                              # these are the tails of the 1520 band 
+  min_spec <- 200 #min(full_set$WAVE)      # these are the tails of the band 
   max_spec <- 3400 # max(full_set$WAVE)
   full_set <- subset(full_set, WAVE >= 200 & WAVE <= 3400 ) #min(full_set$WAVE) & WAVE <= max(full_set$WAVE))
   
-  freq_index <- seq(min_spec,max_spec, by = 1)                                      # establish a full band of which we want readings of
+  freq_index <- seq(min_spec,max_spec, by = 1)    # establish a full band of which we want readings of
   
-  IDs <- levels(droplevels(full_set$ID))                                            # string of all IDs
-  foundation <- NULL                                                                # blank DF to fill
+  IDs <- levels(droplevels(full_set$ID))    # string of all IDs
+  foundation <- NULL                       # blank DF to fill
   
   # run through all IDs 
   for( i in 1:length(IDs)) {
@@ -153,6 +151,13 @@ prePro_sh3et <- function(full_set) {
   }
   
   str(foundation) 
+
+  ##############################################
+  
+  # hashed out section below just checking if we have
+  # bad spectra but did not end up needing for our data.
+  
+  ##############################################
   
   #ggplot(foundation,aes(WAVE,INTENSITY,color = ID))+
   # geom_line(show.legend = F)
@@ -178,7 +183,12 @@ prePro_sh3et <- function(full_set) {
  
   return(foundation) }
 
+#######################################
+
 ##### Preprocess the individual datasets
+
+########################################
+
 reflib_processed <- prePro_sh3et(full_set = reflib)
 head(reflib_processed)
 sum(is.na(reflib_processed$INTENSITY)==T)#0
@@ -203,9 +213,13 @@ dev.off()
 head(reflib_processed)
 
 sum(is.na(reflib_processed$INTENSITY)==T)#0
-#7752
+
+#############################################
 
 #### Rolling median spike removal and polynomial baseline flouresence correction
+
+#############################################
+
 # the plot for each spectra shows the polynomial in red, the raw data in purple, and the rolled median output in black
 poly_below_baseline <- function(foundation) {
   
@@ -216,7 +230,7 @@ poly_below_baseline <- function(foundation) {
   library(pspline)
   library(signal)
   
-  min_spec <- min(foundation$WAVE)                                  # these are the tails of the 1520 band, usually...
+  min_spec <- min(foundation$WAVE)     # these are the tails of the band
   max_spec <- max(foundation$WAVE)
   
   freq_index <- seq(min_spec,max_spec, by = 1)    # establish a full band of which we want readings of
@@ -224,13 +238,13 @@ poly_below_baseline <- function(foundation) {
   
   for( i in 1:length(IDs)) {
     
-    spec1 <- subset(foundation, ID == IDs[i])                # build a single dataframe by WB
+    spec1 <- subset(foundation, ID == IDs[i])                # build a single dataframe
     
-    mod <- list( y = runmed(x = spec1$INTENSITY, k = 15))   #running median filter # D
+    mod <- list( y = runmed(x = spec1$INTENSITY, k = 15))   #running median filter 
     spc <- (as.matrix(t(data.frame(mod$y))))  # D
     
     spc <- new("hyperSpec", spc = spc, wavelength = freq_index )
-    spc_poly <- spc.fit.poly.below(fit.to = spc, poly.order = 7) # attempted 4 earlier, 9 is based on Li et al. 2016, 5th suggested Lieber & Mahadevan-Jansen in 2003
+    spc_poly <- spc.fit.poly.below(fit.to = spc, poly.order = 7) # 7 finds best fit, attempted 4 earlier, 9 is based on Li et al. 2016, 5th suggested Lieber & Mahadevan-Jansen in 2003
     
     plot(x = spec1$WAVE, y = spec1$INTENSITY, col = "purple", type = "l")
     lines(x = spec1$WAVE, y = spc$spc, type = "l")
@@ -268,13 +282,13 @@ IDs <- levels(droplevels(base_df$ID))
 IDs
 
 base_df_na <- base_df[is.na(base_df$INTENSITY==TRUE),]
-#7242
-unique(base_df_na$ID) # 68 specimens have na values
+
+unique(base_df_na$ID)
 base_df_new <- NULL
 
 for(y in 1:length(IDs)){
-  svn_df <- subset(base_df, ID == IDs[y])                                           # grab the specimen
-  plot(svn_df$WAVE, svn_df$INTENSITY, type = "l", yaxt = 'n', ylim = c(-10,5000))     # plot it to look
+  svn_df <- subset(base_df, ID == IDs[y])                # grab the specimen
+  plot(svn_df$WAVE, svn_df$INTENSITY, type = "l", yaxt = 'n', ylim = c(-10,5000)) # plot it to look
   svn_df$INTENSITY <- prospectr::detrend(X = svn_df$INTENSITY, wav = svn_df$WAVE)   # conduct SVN normalization
   svn_df$INTENSITY <- {(svn_df$INTENSITY-min(svn_df$INTENSITY))/(max(svn_df$INTENSITY)-min(svn_df$INTENSITY))} # range 0-1
   par(new = T)
@@ -285,9 +299,9 @@ for(y in 1:length(IDs)){
 head(base_df_new)
 
 base_df_new_na <- base_df_new[is.na(base_df_new$INTENSITY==TRUE),]
-# 0 #7242
-unique(base_df_new_na$ID) #79 #68
-sum(is.na(base_df_new_na$INTENSITY)==TRUE)  # 0 # nearly all
+# 0
+unique(base_df_new_na$ID) 
+sum(is.na(base_df_new_na$INTENSITY)==TRUE)  # 0 
 
 
 
@@ -315,16 +329,6 @@ for( i in 1:length(poly)){
 
 str(base_df)
 
-# intercept loop for vis with differing intercepts to reduce overlap
-#IDs <- levels(droplevels(base_df$ID))
-#base_df_new <- NULL
-#for(z in 1:length(IDs)){
-#  svn_df <- subset(base_df, ID == IDs[z])
-#  svn_df$INTENSITY <- svn_df$INTENSITY + z + 5
-#  base_df_new <- rbind(svn_df,base_df_new)
-#}
-#base_df <- base_df_new
-#str(base_df)
 
 head(base_df)
 base_df$poly_lab <-base_df$SAMPLE
@@ -343,6 +347,6 @@ rm(base_df_new,svn_df,foundation,i,IDs,y,poly_below_baseline)
 
 #hop over to:
 
-# product_moment_corr_2021.R # ProductMomemntCorr.R for spectra reference matching
-# with base_df
+# product_moment_corr.R for spectra reference matching
+# with base_df (reflib_rescaled.csv)
 write.csv(base_df,file="reflib_rescaled.csv")
