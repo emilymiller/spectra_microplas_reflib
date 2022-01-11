@@ -1,5 +1,4 @@
 #' ---
-#' 
 #' #' title: Technical validation using weathered plastics
 #' author: Emily Miller, based on Tyler Gagne's script
 #' date: Fall 2021
