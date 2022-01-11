@@ -1,8 +1,16 @@
-# reflib figure 3 
-# part a
-# then became figure 4
+# 
+#' #' title: reflib figure 4
+#' author: Emily Miller
+#' date: Fall 2021
+#  output: This was a Figure 3 panel component for Miller et al., but
+#   became Figure 4 for Miller et al. A figure depicting 
+#   the spectral matching of an unknown weathered plastic to spectra
+#   in the reference library. It depicts the spectra of its match
+#   (polypropylene) and several spectra it did not match with. This figure
+#   is for illustrative puproses as our matching protocol is quantitative
+#   and uses Pearson's coefficient of correlation (R) but this figure
+#   shows intuitively how these spectra match.
 
-# spectra matching
 
 
 # example of matching
