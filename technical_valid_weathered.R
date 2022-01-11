@@ -1,5 +1,17 @@
-
-# Technical validation
+#' ---
+#' #' title: Technical validation using weathered plastics
+#' author: Emily Miller, based on Tyler Gagne's script
+#' date: Fall 2021
+#' output: Start with cleaning_code.R followed by preprocessing.R before 
+#' using this script). Here, we take unknown weathered plastics and follow our
+#' matching protocol to assign known labels from our reference library.
+#'  We later cross-reference these assignments with those done by S&N Labs
+#'  using their (~6000 plastics in their library). This script produces a
+#'  similarity/distance matrix based on Pearson's correlation coefficients between
+#'  paris. It then assigns the label of the closest match from the reference 
+#'  library to the unlabeled spectra. It
+#'  is the matching protocol described in Miller et al.
+#' ---
 
 ###################################################
 
@@ -9,7 +21,7 @@
   
 ###############################################
 
-reflib<-read.csv("reflib_rescaled.csv")
+reflib<-read.csv("reflib_rescaled.csv") # from preprocessing.R
 head(reflib)
 reflib$X<-NULL
 class(reflib$poly_lab)
