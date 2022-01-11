@@ -1,6 +1,9 @@
-# reflib figure 2
-#
-# dungeness crab carapace chiton
+# 
+#' #' title: reflib figure 2
+#' author: Emily Miller
+#' date: Fall 2021
+#  output: Figure 2 for Miller et al. A figure depicting the steps used to 
+#  process the spectra before inputing them into our matching protocol.
 #
 # BIOL 004
 getwd()
