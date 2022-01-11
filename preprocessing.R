@@ -4,7 +4,8 @@
 #' author: Emily Miller, based on Tyler Gagne's processing
 #' date: Summer 2021
 #' output: csvs to be used in the matching protocol (next script is
-#' product_moment_corr_2021.R)
+#' product_moment_corr_2021.R). Start with cleaning_code.R before using
+#' this script.
 #' ---
 
 # In this script a number of preprocessing steps are executed
