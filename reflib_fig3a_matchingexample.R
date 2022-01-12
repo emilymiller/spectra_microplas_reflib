@@ -13,6 +13,7 @@
 
 
 
+
 # example of matching
 #
 # using polypropylene
@@ -33,6 +34,7 @@ unique(base_df$poly_lab)
 straw <- base_df[base_df$poly_lab == "strawberry container",]
 PP<-rbind(PP,straw)
 
+library(ggplot2)
 ggplot(PP)+
   geom_line(aes(x=PP$WAVE,y=PP$INTENSITY,
                 color=PP$PARTICLE))+
@@ -95,3 +97,4 @@ ggplot(fig3a)+
                 color=PARTICLE))+
   facet_wrap(~PARTICLE)+
   themeo
+
