@@ -6,11 +6,11 @@ Assumes spectra files are separate .csvs for each specimen (and wave number when
 
 
 Start with spectra processing scripts:
-  1) cleaning_code.R
+1) cleaning_code.R
 2) preprocessing.R
 
 Then use the derived data file to follow matching protocol:
-  3) technical_valid_weathered.R
+3) technical_valid_weathered.R
 
 Remaining scripts in repo are used for constructing figures in Miller et al. and for applications with this reference library.
 
